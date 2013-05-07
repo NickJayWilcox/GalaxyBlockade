@@ -2,6 +2,10 @@ package net.techpanda.galaxyblockade.manager;
 
 import org.andengine.engine.Engine;
 import org.andengine.engine.camera.Camera;
+import org.andengine.opengl.font.Font;
+import org.andengine.opengl.font.FontFactory;
+import org.andengine.opengl.font.exception.FontException;
+import org.andengine.opengl.texture.ITexture;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
@@ -11,13 +15,13 @@ import org.andengine.opengl.texture.atlas.buildable.builder.BlackPawnTextureAtla
 import org.andengine.opengl.texture.atlas.buildable.builder.ITextureAtlasBuilder.TextureAtlasBuilderException;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
+import org.andengine.util.color.Color;
 import org.andengine.util.debug.Debug;
 
 import net.techpanda.galaxyblockade.GameActivity;
 
 /**
- * @author Mateusz Mysliwiec
- * @author www.matim-dev.com
+ * @author Nicholas Wilcox
  * @version 1.0
  */
 public class ResourceManager{
@@ -26,6 +30,16 @@ public class ResourceManager{
     //---------------------------------------------
     private static final ResourceManager INSTANCE = new ResourceManager();
 
+    public Engine engine;
+    public GameActivity activity;
+    public Camera camera;
+    public VertexBufferObjectManager vbom;
+    
+    public Font font;
+    
+    //---------------------------------------------
+    // TEXTURES & TEXTURE REGIONS
+    //---------------------------------------------
     private BitmapTextureAtlas splashTextureAtlas;
     public ITextureRegion splash_region;
     public ITextureRegion menu_background_region;
@@ -34,28 +48,20 @@ public class ResourceManager{
     public ITextureRegion about_region;
     public ITextureRegion continuous_region;
     public ITextureRegion support_region;
-        
+    
+    public ITextureRegion game_interface_region;
+    private BitmapTextureAtlas interfaceTextureAtlas;
+    
     private BuildableBitmapTextureAtlas menuTextureAtlas;
     
-    public Engine engine;
-    public GameActivity activity;
-    public Camera camera;
-    public VertexBufferObjectManager vbom;
-    
-    
-    
     //---------------------------------------------
-    // TEXTURES & TEXTURE REGIONS
+    // LOAD RESOURCES
     //---------------------------------------------
-    
-    //---------------------------------------------
-    // CLASS LOGIC
-    //---------------------------------------------
-
     public void loadMenuResources()
     {
         loadMenuGraphics();
         loadMenuAudio();
+        loadMenuFonts();
     }
     
     public void loadGameResources()
@@ -63,8 +69,11 @@ public class ResourceManager{
         loadGameGraphics();
         loadGameFonts();
         loadGameAudio();
-    }
+    }   
     
+    //---------------------------------------------
+    //MENU RELATED RESOURCES
+    //---------------------------------------------
     private void loadMenuGraphics()
     {
     	BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/menu/");
@@ -88,14 +97,40 @@ public class ResourceManager{
 
     }
     
+    private void loadMenuFonts()
+    {
+        FontFactory.setAssetBasePath("font/");
+        final ITexture mainFontTexture = new BitmapTextureAtlas(activity.getTextureManager(), 256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+
+        font = FontFactory.createStrokeFromAsset(activity.getFontManager(), mainFontTexture, activity.getAssets(),"Sansation_Regular.ttf", 50, true, Color.WHITE_ARGB_PACKED_INT, 2, Color.BLACK_ABGR_PACKED_INT);
+        font.load();
+        
+    }
+    
+    public void unloadMenuTextures()
+    {
+        menuTextureAtlas.unload();
+    }
+        
+    public void loadMenuTextures()
+    {
+        menuTextureAtlas.load();
+    }
+    
     private void loadMenuAudio()
     {
         
     }
-
+    
+    //---------------------------------------------
+    //GAME RELATED RESOURCES
+    //---------------------------------------------
     private void loadGameGraphics()
     {
-        
+    	BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/interface/");
+    	interfaceTextureAtlas = new BitmapTextureAtlas(activity.getTextureManager(), 480, 800, TextureOptions.BILINEAR);
+    	game_interface_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(interfaceTextureAtlas, activity, "interface.png", 0, 0);
+    	interfaceTextureAtlas.load();
     }
     
     private void loadGameFonts()
@@ -106,8 +141,16 @@ public class ResourceManager{
     private void loadGameAudio()
     {
         
+    }   
+    
+    public void unloadGameTextures()
+    {
+        // TODO (Since we did not create any textures for game scene yet)
     }
     
+    //---------------------------------------------
+    //SPLASH RELATED RESOURCES
+    //---------------------------------------------
     public void loadSplashScreen()
     {
     	BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/backgrounds/");

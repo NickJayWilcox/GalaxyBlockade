@@ -18,6 +18,8 @@ import org.andengine.engine.options.resolutionpolicy.FillResolutionPolicy;
 import org.andengine.entity.scene.Scene;
 import org.andengine.ui.activity.BaseGameActivity;
 
+import android.view.KeyEvent;
+
 /**
  * @author Nicholas Wilcox
  * @version 1.0
@@ -70,6 +72,27 @@ public class GameActivity extends BaseGameActivity
             }
         }));
         pOnPopulateSceneCallback.onPopulateSceneFinished();
+    }
+    
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+            
+        if (this.isGameLoaded())
+        {
+            System.exit(0);    
+        }
+    }
+    
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) 
+    {  
+        if (keyCode == KeyEvent.KEYCODE_BACK)
+        {
+            SceneManager.getInstance().getCurrentScene().onBackKeyPressed();
+        }
+        return false; 
     }
 }
 

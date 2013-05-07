@@ -9,6 +9,7 @@ import org.andengine.entity.scene.menu.item.decorator.ScaleMenuItemDecorator;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.opengl.util.GLState;
 
+import net.techpanda.galaxyblockade.manager.SceneManager;
 import net.techpanda.galaxyblockade.manager.SceneManager.SceneType;
 import net.techpanda.galaxyblockade.scene.BaseScene;
 
@@ -65,7 +66,8 @@ public class MainMenuScene extends BaseScene implements IOnMenuItemClickListener
     {
 		this.detachSelf();
 		this.dispose();
-    }
+    }   
+    
     
     private void createMenuChildScene()
     {
@@ -102,6 +104,8 @@ public class MainMenuScene extends BaseScene implements IOnMenuItemClickListener
 	        switch(pMenuItem.getID())
 	        {
 	        case MENU_PLAY:
+	        	//Load Game
+	        	SceneManager.getInstance().loadGameScene(engine);
 	            return true;
 	        case MENU_CONTINUOUS:
 	            return true;

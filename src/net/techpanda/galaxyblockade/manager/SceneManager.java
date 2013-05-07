@@ -1,8 +1,12 @@
 package net.techpanda.galaxyblockade.manager;
 import org.andengine.engine.Engine;
+import org.andengine.engine.handler.timer.ITimerCallback;
+import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.ui.IGameInterface.OnCreateSceneCallback;
 
 import net.techpanda.galaxyblockade.scene.BaseScene;
+import net.techpanda.galaxyblockade.scene.GameScene;
+import net.techpanda.galaxyblockade.scene.LoadScene;
 import net.techpanda.galaxyblockade.scene.MainMenuScene;
 import net.techpanda.galaxyblockade.scene.SplashScene;
 /**
@@ -92,9 +96,44 @@ public class SceneManager
     {
         ResourceManager.getInstance().loadMenuResources();
         menuScene = new MainMenuScene();
-        setScene(menuScene);
+        loadingScene = new LoadScene();
+        SceneManager.getInstance().setScene(menuScene);
         disposeSplashScene();
     }
+    
+    public void loadMenuScene(final Engine mEngine)
+    {
+        setScene(loadingScene);
+        gameScene.disposeScene();
+        ResourceManager.getInstance().unloadGameTextures();
+        mEngine.registerUpdateHandler(new TimerHandler(0.1f, new ITimerCallback() 
+        {
+            public void onTimePassed(final TimerHandler pTimerHandler) 
+            {
+                mEngine.unregisterUpdateHandler(pTimerHandler);
+                ResourceManager.getInstance().loadMenuTextures();
+                setScene(menuScene);
+            }
+        }));
+    }
+    
+    public void loadGameScene(final Engine mEngine)
+    {
+        setScene(loadingScene);
+        ResourceManager.getInstance().unloadMenuTextures();
+        mEngine.registerUpdateHandler(new TimerHandler(0.1f, new ITimerCallback() 
+        {
+            public void onTimePassed(final TimerHandler pTimerHandler) 
+            {
+                mEngine.unregisterUpdateHandler(pTimerHandler);
+                ResourceManager.getInstance().loadGameResources();
+                gameScene = new GameScene();
+                setScene(gameScene);
+            }
+        }));
+    }
+    
+    
     
     //---------------------------------------------
     // GETTERS AND SETTERS
